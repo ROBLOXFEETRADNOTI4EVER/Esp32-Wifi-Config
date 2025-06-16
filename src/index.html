@@ -3,119 +3,502 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WiFi Configuration</title>
+    <title>🦀 You Did It Amazing! 🦀</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 400px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 5px;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
-            font-size: 16px;
         }
-        button {
-            width: 100%;
-            background: #007bff;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #ce422b 0%, #f74c00 50%, #daa520 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            overflow-x: hidden;
+            position: relative;
         }
-        button:hover {
-            background: #0056b3;
-        }
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
             text-align: center;
-            display: none;
+            padding: clamp(1rem, 4vw, 2rem);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 2px solid #f74c00;
+            position: relative;
+            z-index: 10;
         }
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+
+        .rust-logo {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
         }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+
+        .main-title {
+            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-weight: bold;
+            color: #f74c00;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            color: #daa520;
+            margin-bottom: 2rem;
+            font-style: italic;
+            line-height: 1.4;
+        }
+
+        .achievement-box {
+            background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
+            padding: clamp(1rem, 4vw, 2rem);
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 2px solid #f74c00;
+        }
+
+        .achievement-text {
+            color: #ffffff;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            color: #f74c00;
+            font-weight: bold;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: #daa520;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            margin-top: 0.5rem;
+        }
+
+        .rust-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: rgba(247, 76, 0, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #f74c00;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(247, 76, 0, 0.3);
+        }
+
+        .feature-title {
+            color: #f74c00;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        .feature-desc {
+            color: #daa520;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            line-height: 1.4;
+        }
+
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .celebration-btn {
+            background: linear-gradient(45deg, #f74c00, #ce422b);
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(247, 76, 0, 0.4);
+            min-width: 200px;
+            min-height: 48px; /* Touch-friendly */
+        }
+
+        .celebration-btn:hover,
+        .celebration-btn:focus {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(247, 76, 0, 0.6);
+            outline: 2px solid #daa520;
+        }
+
+        .celebration-btn:active {
+            transform: scale(0.98);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-crab {
+            position: absolute;
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+        }
+
+        .message-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: #f74c00;
+            padding: 2rem;
+            border-radius: 15px;
+            border: 2px solid #f74c00;
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            text-align: center;
+            z-index: 10000;
+            max-width: 90vw;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            line-height: 1.5;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-8px); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(3deg); }
+            50% { transform: translateY(-25px) rotate(-3deg); }
+            75% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); }
+            50% { text-shadow: 0 0 20px #f74c00, 2px 2px 4px rgba(0, 0, 0, 0.7); }
+        }
+
+        .glow-text {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0; 
+                transform: translate(-50%, -40%); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translate(-50%, -50%); 
+            }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .popup-enter {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        .popup-exit {
+            animation: fadeOut 0.4s ease-out forwards;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 480px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .container {
+                border-radius: 10px;
+                margin: 0;
+            }
+            
+            .rust-features {
+                grid-template-columns: 1fr;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .celebration-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .floating-crab {
+                display: none; /* Hide on very small screens for performance */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            .rust-logo,
+            .floating-crab,
+            .glow-text {
+                animation: none;
+            }
+            
+            .celebration-btn:hover {
+                transform: none;
+            }
+        }
+
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .container {
+                border-width: 3px;
+                background: rgba(0, 0, 0, 0.95);
+            }
         }
     </style>
 </head>
 <body>
+    <div class="floating-elements">
+        <div class="floating-crab" style="top: 10%; left: 10%;">🦀</div>
+        <div class="floating-crab" style="top: 20%; right: 15%; animation-delay: -2s;">⚙️</div>
+        <div class="floating-crab" style="top: 60%; left: 5%; animation-delay: -4s;">🦀</div>
+        <div class="floating-crab" style="top: 80%; right: 10%; animation-delay: -1s;">⚡</div>
+        <div class="floating-crab" style="top: 40%; right: 5%; animation-delay: -3s;">🔥</div>
+    </div>
+
     <div class="container">
-        <h1>WiFi Configuration</h1>
-        <form id="wifiForm">
-            <label for="ssid">WiFi Network (SSID):</label>
-            <input type="text" id="ssid" name="ssid" placeholder="Enter WiFi network name" required>
-            
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" placeholder="Enter WiFi password" required>
-            
-            <button type="submit">Connect to WiFi</button>
-        </form>
-        
-        <div id="status" class="status"></div>
+        <div class="rust-logo">🦀</div>
+        <h1 class="main-title glow-text">YOU DID IT!</h1>
+        <p class="subtitle">AMAZING RUST ACHIEVEMENT UNLOCKED!</p>
+
+        <div class="achievement-box">
+            <p class="achievement-text">
+                🎉 <strong>Congratulations, Rustacean!</strong> 🎉<br>
+                You've successfully compiled your way to greatness with the most beloved systems programming language!
+            </p>
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number" id="bugs-prevented">0</span>
+                <span class="stat-label">Bugs Prevented</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="memory-safety">100</span>
+                <span class="stat-label">% Memory Safe</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="zero-cost">∞</span>
+                <span class="stat-label">Zero-Cost Abstractions</span>
+            </div>
+        </div>
+
+        <div class="rust-features">
+            <div class="feature-card">
+                <div class="feature-title">🚀 Blazingly Fast</div>
+                <div class="feature-desc">Zero-cost abstractions and compile-time optimizations</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">🛡️ Memory Safe</div>
+                <div class="feature-desc">No null pointers, buffer overflows, or memory leaks</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">⚡ Concurrent</div>
+                <div class="feature-desc">Fearless concurrency with ownership system</div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-title">🔧 Reliable</div>
+                <div class="feature-desc">Rich type system and ownership model prevent bugs</div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="celebration-btn" onclick="celebrate()">🎊 CELEBRATE WITH FERRIS! 🎊</button>
+            <button class="celebration-btn" onclick="showMessage()">📜 SHOW WISDOM 📜</button>
+        </div>
     </div>
 
     <script>
-        document.getElementById('wifiForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+        let bugCount = 0;
+        let isAnimating = false;
+
+        function celebrate() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            // Create celebration particles
+            for (let i = 0; i < 30; i++) {
+                createParticle();
+            }
+
+            // Visual feedback
+            document.body.style.background = 'linear-gradient(135deg, #f74c00 0%, #ce422b 50%, #daa520 100%)';
+            setTimeout(() => {
+                document.body.style.background = 'linear-gradient(135deg, #ce422b 0%, #f74c00 50%, #daa520 100%)';
+                isAnimating = false;
+            }, 1000);
+
+            // Animate bug counter
+            const bugsEl = document.getElementById('bugs-prevented');
+            let currentCount = bugCount;
+            const targetCount = bugCount + Math.floor(Math.random() * 500) + 100;
             
-            const ssid = document.getElementById('ssid').value;
-            const password = document.getElementById('password').value;
-            const statusDiv = document.getElementById('status');
-            
-            // Show loading
-            statusDiv.style.display = 'block';
-            statusDiv.className = 'status';
-            statusDiv.textContent = 'Connecting...';
-            
-            try {
-                const response = await fetch('/post-wifi', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        ssid: ssid,
-                        password: password
-                    })
-                });
-                
-                if (response.ok) {
-                    statusDiv.className = 'status success';
-                    statusDiv.textContent = 'WiFi credentials sent successfully!';
-                } else {
-                    statusDiv.className = 'status error';
-                    statusDiv.textContent = 'Failed to send WiFi credentials.';
+            const interval = setInterval(() => {
+                currentCount += Math.floor(Math.random() * 20) + 5;
+                bugsEl.textContent = currentCount;
+                if (currentCount >= targetCount) {
+                    clearInterval(interval);
+                    bugCount = targetCount;
+                    if (targetCount > 2000) {
+                        bugsEl.textContent = '∞';
+                    }
                 }
-            } catch (error) {
-                statusDiv.className = 'status error';
-                statusDiv.textContent = 'Connection error: ' + error.message;
+            }, 50);
+        }
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.innerHTML = ['🦀', '⚡', '🔥', '✨', '🎉', '⚙️'][Math.floor(Math.random() * 6)];
+            particle.style.cssText = `
+                position: fixed;
+                left: ${Math.random() * 100}vw;
+                top: 100vh;
+                font-size: ${1 + Math.random()}rem;
+                pointer-events: none;
+                z-index: 1000;
+                animation: particleFloat ${2 + Math.random() * 2}s ease-out forwards;
+            `;
+            
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.remove();
+                }
+            }, 4000);
+        }
+
+        function showMessage() {
+            const messages = [
+                "🦀 'The borrow checker is your friend!' - Ferris",
+                "⚡ 'Fast, safe, productive - pick three!' - Rust",
+                "🛡️ 'If it compiles, it probably works!' - Rustacean Wisdom",
+                "🔥 'Zero-cost abstractions, maximum-cost learning!' - The Rust Book",
+                "⚙️ 'Ownership is not just about memory!' - Deep Rust Thought",
+                "🚀 'Rust: Because segfaults are so last century!' - Modern Developer"
+            ];
+            
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            
+            const popup = document.createElement('div');
+            popup.innerHTML = randomMessage;
+            popup.className = 'message-popup popup-enter';
+            
+            document.body.appendChild(popup);
+            
+            // Close on click
+            popup.addEventListener('click', () => closePopup(popup));
+            
+            // Auto close
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    closePopup(popup);
+                }
+            }, 4000);
+        }
+
+        function closePopup(popup) {
+            popup.className = 'message-popup popup-exit';
+            setTimeout(() => {
+                if (popup.parentNode) {
+                    popup.remove();
+                }
+            }, 400);
+        }
+
+        // Add particle animation CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes particleFloat {
+                to {
+                    transform: translateY(-100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Auto-increment stats on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const memoryEl = document.getElementById('memory-safety');
+                let count = 0;
+                const interval = setInterval(() => {
+                    count += 2;
+                    memoryEl.textContent = count;
+                    if (count >= 100) {
+                        clearInterval(interval);
+                        memoryEl.textContent = '100';
+                    }
+                }, 30);
+            }, 500);
+        });
+
+        // Handle touch events for mobile
+        document.addEventListener('touchstart', function(e) {
+            // Prevent zoom on double tap for buttons
+            if (e.target.classList.contains('celebration-btn')) {
+                e.preventDefault();
             }
         });
     </script>
