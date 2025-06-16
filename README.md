@@ -23,7 +23,7 @@ An advanced ESP32 Rust-based WiFi configuration system that automatically switch
 1. ESP32 boots without stored credentials
 2. Automatically starts in **Access Point mode**
 3. Creates WiFi hotspot: `ESP32-Config`
-4. Serves configuration page at `192.168.4.1`
+4. Serves configuration page at `192.168.13.37`
 5. User enters WiFi credentials via web interface
 6. Credentials saved to flash and device reboots
 
@@ -44,3 +44,23 @@ An advanced ESP32 Rust-based WiFi configuration system that automatically switch
 
 ## 📦 Dependencies
 
+[dependencies]
+esp-hal = { version = "1.0.0-beta", features = ["esp32", "defmt", "unstable"] }
+embassy-executor = { version = "0.7.0", features = ["defmt", "task-arena-size-65536"] }
+embassy-net = { version = "0.6.0", features = ["dhcpv4", "medium-ethernet", "tcp", "udp"] }
+embassy-time = { version = "0.4.0", features = ["generic-queue-8"] }
+esp-wifi = { version = "0.13.0", features = ["builtin-scheduler", "defmt", "esp-alloc", "esp32", "wifi"] }
+esp-storage = { version = "0.4.0", features = ["esp32"] }
+picoserve = { version = "0.15.0", features = ["embassy"] }
+heapless = { version = "0.8.0", default-features = false }
+serde = { version = "1.0.217", default-features = false, features = ["derive"] }
+static_cell = { version = "2.1.0", features = ["nightly"] }
+defmt = "0.3.10"
+anyhow = { version = "1.0.95", default-features = false }
+embedded-storage = "0.3.0"
+critical-section = "1.2.0"
+
+## 🚀 Quick Start
+
+### Prerequisites
+https://esp32.implrust.com/wifi/index.html 
