@@ -3,26 +3,24 @@
 
 use defmt::info;
 use embassy_executor::Spawner;
-use esp_hal::clock::CpuClock;
+use esp_hal::{clock::CpuClock, peripheral};
 use esp_hal::rng::Rng;
 use esp_hal::timer::timg::TimerGroup;
 use esp_println as _;
 use esp_hal::system::software_reset;
-
+use esp_hal::gpio::{self, Input, InputConfig, Level, Output, OutputConfig, Pull};
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
     loop {}
 }
-
+use embassy_time::{self, Duration, Timer}; 
 extern crate alloc;
 use esp_storage::FlashStorage;
 use embedded_storage::{ReadStorage, Storage};
 use esp_wifi::EspWifiController;
 use wifi_ap as lib;
 
-fn trigger_reset() -> ! {
-    software_reset();
-}
+
 #[esp_hal_embassy::main]
 async fn main(spawner: Spawner) {
     // generator version: 0.3.1
@@ -34,7 +32,6 @@ async fn main(spawner: Spawner) {
 
     let timer0 = TimerGroup::new(peripherals.TIMG1);
     esp_hal_embassy::init(timer0.timer0);
-
     info!("Embassy initialized!");
 //     let mut counter = ReloadCounter::new();
 // let reload_times = counter.get_and_increment();
@@ -54,16 +51,15 @@ async fn main(spawner: Spawner) {
         esp_wifi::init(timer1.timer0, rng.clone(), peripherals.RADIO_CLK,).unwrap()
     );
     let mut buffer = [0u8; 32];
+spawner.must_spawn(reset_memory(Input::new(peripherals.GPIO4, InputConfig::default().with_pull(Pull::Up))));
 
     let stack = match FlashStorage::new().read(STORAGE_OFFSET, &mut buffer) {
         Ok(_) => {
             if buffer.iter().all(|&b| b == 0xFF) {
                 info!("No credentials - using AP mode stack");
-                // Use your AP mode WiFi function
                 lib::wifi::start_wifi(esp_wifi_ctrl, peripherals.WIFI, rng, &spawner).await.unwrap()
             } else {
                 info!("Credentials found - using client mode stack");  
-                // Use your client mode WiFi function
                 lib::http_wifi::start_wifi(esp_wifi_ctrl, peripherals.WIFI, rng, &spawner).await
             }
         }
@@ -127,5 +123,77 @@ async fn main(spawner: Spawner) {
     };
 
 
+}
 
+#[embassy_executor::task]
+async fn reset_memory(mut button : Input<'static>){
+    let mut last_state = button.is_high();
+    let mut button_pressed_count: i8 = 0;
+    let mut start_time = embassy_time::Instant::now();
+    const STORAGE_OFFSET : u32 = 0x110000;
+    let mut buffer = [0u8; 32];
+
+    loop {
+        let current_state = button.is_high();
+        
+     if current_state != last_state {
+    if button.is_low() && button_pressed_count < 14 {
+        button_pressed_count += 1;
+            info!("Button PRESSED => {} Times", button_pressed_count);
+            
+            if button_pressed_count == 1 {
+                start_time = embassy_time::Instant::now();
+            }
+            if button_pressed_count == 14 {
+                let elapsed = embassy_time::Instant::now() - start_time;
+                if elapsed <= embassy_time::Duration::from_secs(10) {
+                    let read_memory = match FlashStorage::new().read(STORAGE_OFFSET, &mut buffer) {
+                        Ok(_) => {
+                            if buffer.iter().all(|&b| b == 0xFF) {
+                                info!("No credentials were found - already clean");
+                            } else {
+                                info!("Credentials found - Cleaning now");
+                                let erase_buffer = [0xFF; 32]; 
+                                
+                                match FlashStorage::new().write(STORAGE_OFFSET, &erase_buffer) {
+                                    Ok(_) => {
+                                        info!("🦀 Flash memory cleaned successfully!");
+                                        info!("🦀 Device will reboot in 3 seconds...");
+                                        
+                                        let mut countdown = 3;
+                                        let rust: &str = "🦀";
+                                        
+                                        while countdown > 0 {
+                                            info!("Rebooting in  {}...{}", countdown,rust);
+
+                                            Timer::after(Duration::from_millis(1000)).await;
+                                            countdown -= 1;
+                                        }
+                                        
+                                        software_reset();
+                                    }
+                                    Err(e) => {
+                                        info!("Failed to clean flash memory: {:?}", defmt::Debug2Format(&e));
+                                    }
+                                }
+                            }
+                        }
+                        Err(e) => {
+                            info!("Error reading flash memory: {:?}", defmt::Debug2Format(&e));
+                        }
+                    };
+                } else {
+                    info!("14 presses but took too long ({:?} seconds)", elapsed.as_secs());
+                }
+                button_pressed_count = 0;
+            }
+        } else {
+            info!("Button RELEASED (Button was pressed before => {} Times)", button_pressed_count);
+            }
+            last_state = current_state;
+        }
+        button.wait_for_any_edge().await;
+    }
+
+ 
 }
