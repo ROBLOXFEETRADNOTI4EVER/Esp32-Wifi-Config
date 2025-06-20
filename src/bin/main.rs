@@ -60,7 +60,8 @@ spawner.must_spawn(reset_memory(Input::new(peripherals.GPIO4, InputConfig::defau
                 lib::wifi::start_wifi(esp_wifi_ctrl, peripherals.WIFI, rng, &spawner).await.unwrap()
             } else {
                 info!("Credentials found - using client mode stack");  
-                lib::http_wifi::start_wifi(esp_wifi_ctrl, peripherals.WIFI, rng, &spawner).await
+                let led_pin = peripherals.GPIO2;
+                lib::http_wifi::start_wifi(esp_wifi_ctrl, peripherals.WIFI, rng, &spawner, led_pin).await
             }
         }
         Err(_) => {

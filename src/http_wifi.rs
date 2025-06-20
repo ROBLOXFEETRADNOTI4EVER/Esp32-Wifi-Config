@@ -2,6 +2,7 @@ use defmt::info;
 use embassy_executor::Spawner;
 use embassy_net::{DhcpConfig, Runner, Stack, StackResources};
 use embassy_time::{Duration, Timer};
+use esp_hal::timer::timg::TimerGroup;
 use esp_hal::rng::Rng;
 use esp_println as _;
 use esp_println::println;
@@ -13,6 +14,8 @@ use crate::mk_static;
 use critical_section::Mutex;
 use core::cell::RefCell;
 use heapless; 
+use esp_hal::gpio::{self, Input, InputConfig, Level, Output, OutputConfig, Pull};
+use esp_hal::{clock::CpuClock, peripheral};
 
 static SSID_STORAGE: Mutex<RefCell<[u8; 32]>> = Mutex::new(RefCell::new([0; 32]));
 static PASSWORD_STORAGE: Mutex<RefCell<[u8; 64]>> = Mutex::new(RefCell::new([0; 64]));
@@ -62,13 +65,13 @@ fn get_global_password() -> Option<[u8; 64]> {
     })
 }
 #[embassy_executor::task]
-async fn connection_task(mut controller: WifiController<'static>) {
+async fn connection_task(mut controller: WifiController<'static>,spawner: Spawner,   led_pin: esp_hal::gpio::GpioPin<2> ) {
     println!("start connection task");
     println!("Device capabilities: {:?}", controller.capabilities());
+    let mut led_spawned = false;
     loop {
         match esp_wifi::wifi::wifi_state() {
             WifiState::StaConnected => {
-                // wait until we're no longer connected
                 controller.wait_for_event(WifiEvent::StaDisconnected).await;
                 Timer::after(Duration::from_millis(5000)).await
             }
@@ -136,7 +139,15 @@ async fn connection_task(mut controller: WifiController<'static>) {
             println!("Wifi started!");
         }
         match controller.connect_async().await {
-            Ok(_) => println!("Wifi connected!"),
+            Ok(_) => { println!("Wifi connected!");
+            if !led_spawned {
+                let led = Output::new(led_pin, Level::Low, OutputConfig::default());
+                spawner.must_spawn(blink_led(led));
+                led_spawned = true;
+            }
+                        break;
+        }
+            ,
             Err(e) => {
                 println!("Failed to connect to wifi: {:?}", e);
                 Timer::after(Duration::from_millis(5000)).await
@@ -153,11 +164,24 @@ async fn net_task(mut runner: Runner<'static, WifiDevice<'static>>) {
     runner.run().await
 }
 
+#[embassy_executor::task]
+async  fn blink_led(mut led: Output<'static>){
+
+
+    for _ in (1..7) {
+        led.set_high();
+        Timer::after(Duration::from_millis(500)).await;
+        led.set_low();
+        Timer::after(Duration::from_millis(500)).await;
+    }
+}
+
 pub async fn start_wifi(
     esp_wifi_ctrl: &'static EspWifiController<'static>,
     wifi: esp_hal::peripherals::WIFI,
     mut rng: Rng,
     spawner: &Spawner,
+    led_pin: esp_hal::gpio::GpioPin<2>
 ) -> Stack<'static> {
     let (controller, interfaces) = esp_wifi::wifi::new(&esp_wifi_ctrl, wifi).unwrap();
     let wifi_interface = interfaces.sta;
@@ -174,8 +198,8 @@ pub async fn start_wifi(
         net_seed,
     );
 
-    spawner.spawn(connection_task(controller)).ok();
-    spawner.spawn(net_task(runner)).ok();
+    spawner.spawn(connection_task(controller, spawner.clone(), led_pin)).ok();
+            spawner.spawn(net_task(runner)).ok();
 
     wait_for_connection(stack).await;
 
